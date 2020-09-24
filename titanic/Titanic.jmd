@@ -1,0 +1,264 @@
+---
+title : Titanic 
+author : Ronald Bactawar
+date: `j Date(now())`
+weave_options:
+  echo: true
+---
+
+
+
+```julia
+using Dates
+using Statistics
+using DataFrames
+using Queryverse
+using VegaLite
+using MLJ
+using ShapML
+```
+
+### Objective and Preview
+
+The titanic data was loadeded from a .csv file.  
+The target variable is "Survived", while the other variables are predictors.  
+Pclass refers to the passenger class, SibSp to the number of siblings/spouses aboard, parch  to the number of parents/children aboard and embarked to the port of embankment. 
+The main objective is to predict Survival based on the predictors.
+
+```julia
+titanic = Queryverse.load("/home/chigball/Data/train.csv") |>
+@select(-:PassengerId, -:Name, -:Ticket, -:Cabin) |>
+@mutate(Survived = string(_.Survived)) |>
+DataFrame;
+
+# Data preview
+dpreview = first(titanic, 5)
+```
+
+### Data Summary
+
+The graph below summarizes the data. Age has 177 values missing therefore an imputation of the average was used to fill in the missing values.  
+Embarked has a couple values missing therefore those records were removed.
+
+```julia
+describe(titanic)
+```
+
+### Data Exploration
+
+- Age does not make much diffrence to the survival rate. A few females (older than 60) had a perfect survival rate only because sample sizes were low.
+
+- Higher class people had a higher survival rate.
+
+- Females had a higher survival rate than males.
+
+- People with 1 or 2 siblings onboard tend to fare the best compared to people no siblings or > 2 siblings.
+
+- Embarkation from Cherbourg was assoicated with higer survial rate.
+
+```julia; results = "hidden" 
+# Data For exploration 
+titanic_e = Queryverse.load("/home/chigball/Data/train.csv") |>
+@select(-:PassengerId, -:Name, -:Ticket, -:Cabin) |>
+@filter(isna(_.Embarked) == false) |>
+DataFrame;
+
+## Plot for Pclass
+p1 =
+@vlplot(
+  data = titanic_e,
+  mark = :bar,
+  x = "Pclass:n",
+  y = {"mean(Survived)", title = "Survival Rate"},
+  height = 200,
+  width = 200,
+);
+
+## Plot for Sex
+p2 =
+@vlplot(
+  data = titanic_e,
+  mark = :bar,
+  x = "Sex:n",
+  y = {"mean(Survived)", title = "Survival Rate"},
+  height = 200,
+  width = 200,
+);
+
+
+## Plot for SibSp
+p3 =
+@vlplot(
+  data = titanic_e,
+  mark = :bar,
+  x = "SibSp:n",
+  y = {"mean(Survived)", title = "Survival Rate"},
+  height = 200,
+  width = 200,
+);
+
+
+## Plot for Embarked
+p4 =
+@vlplot(
+  data = titanic_e,
+  mark = :bar,
+  x = "Embarked:n",
+  y = {"mean(Survived)", title = "Survival Rate"},
+  height = 200,
+  width = 200,
+);
+
+
+# Plot of Fare
+
+p5 = @vlplot(
+  data = titanic_e,
+  mark = :bar,
+  x = "Survived:n",
+  y = {"mean(Fare)", title = "Average Fare"},
+  width = 200,
+  height = 200
+);
+
+# Plot of Age
+
+p6 = @vlplot(
+  data = titanic_e,
+  mark = :bar,
+  x = {"Sex:n", title = ""},
+  y = {"mean(Survived)", title = "Survival Rate"},
+  column = {"Age", bin = true, title = "Survival by Age and Gender"},
+  color = "Sex:n"
+);
+
+""
+```
+
+```julia
+p6
+```
+
+```julia
+[[p1 p2 p3]; [p4 p5]]
+
+```
+
+
+### Model Building
+
+- An initial pipeline is built to predict survival
+- The pipeline consist of a fill-imputer, onehotencoder and a randomforest-classifier
+
+```julia
+# Filter out missing Sex
+titanic = titanic |> @filter(isna(_.Embarked)==false) |> DataFrame
+
+# Choose X
+X = titanic |> 
+@select(-:Survived) |>  
+DataFrame;
+
+# Choose y
+y = categorical(titanic.Survived);
+
+## *Maybe when unpacking just change the SciType of target*
+# y1, X1 = unpack(titanic, ==(:Survived), colname -> true; :Survived=>Multiclass);
+## *Change SciType of X when pushing through the pipeline*
+
+# Choose mapping
+D2 = Dict(
+  :Pclass=>Multiclass, 
+  :Sex=>Multiclass, 
+  :SibSp=>Continuous, 
+  :Parch=>Continuous, 
+  :Fare=>Continuous,
+  :Embarked=>Union{Missing,Multiclass});
+
+# Load models
+@load FillImputer # Import FillImputer model
+@load OneHotEncoder # Import OneHotEncoder model
+@load RandomForestClassifier pkg="DecisionTree"  # Import DecisionTreeClassifier model
+
+
+# Create a model composite pipeline
+pipe = @pipeline MyPipe(
+  X -> coerce(X, D2),
+  fill = FillImputer(),
+  hot = OneHotEncoder(),
+  dtc = RandomForestClassifier()
+) prediction_type=:probabilistic  #  Remember to fucking do this
+```
+
+###  Model Evaluation
+
+- Define resampling strategy
+    - holdout(70/30 split)
+- Define measures
+    - crossentropy, BrierScore, area under curve
+
+The results suggest a good fit for these metrics. 
+
+
+```julia
+# Fit a machine
+mach = machine(pipe, X, y);
+fit!(mach);
+
+# Evaluate model
+evaluate!(mach, 
+  resampling=Holdout(fraction_train=0.7, shuffle=true, rng=1234),
+  measures=[cross_entropy, BrierScore(), area_under_curve],  
+  check_measure=false,
+  verbosity = 0
+);
+```
+
+### Model Tuning
+
+The parameters max-depth and n-trees were tuned and a learning curve fitted to each.  The optimal values for these were found to be 6 and 16, so the models were refitted to this.
+
+```julia
+# Define ranges for tuning
+r1 = range(pipe, :(dtc.max_depth), lower=-1, upper = 20); # 6 is optimal
+r2 = range(pipe, :(dtc.n_trees), lower=5, upper = 20); # 15 is optimal
+
+# Tuning paramaters
+pipe.dtc.max_depth = 6;
+pipe.dtc.n_trees = 15;
+
+# Refit the machine
+mach = machine(pipe, X, y);
+fit!(mach);
+
+# Create 2 learning curves
+curve1 = learning_curve(mach; range=r1, resampling=CV(), measure=cross_entropy);
+curve2 = learning_curve(mach; range=r2, resampling=CV(), measure=cross_entropy);
+
+# Function to plot learning curves
+function plot_lc(curve::NamedTuple, measure::String)
+  
+  # Create a dataframe from data
+  df = DataFrame(parameter_values = curve.parameter_values, measurements = curve.measurements)
+  
+  # Use vlplot to plot data  
+  @vlplot(
+    data = df,
+    mark = {:line, tooltip = true, point = true},
+    x = {"parameter_values:q", title = curve.parameter_name},
+    y = {"measurements:q", title = measure},
+    title = "Learning Curve",
+    height = 250,
+    width = 260
+  )  
+end
+
+# First learning curve
+p1 = plot_lc(curve1, "entropy");
+
+# Second learning curve
+p2 = plot_lc(curve2, "entropy");
+
+pl = [p1 p2]
+
+```

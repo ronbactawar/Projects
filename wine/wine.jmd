@@ -1,0 +1,177 @@
+---
+title : Wine Quality 
+author : Ronald Bactawar
+date: `j Date(now())`
+weave_options:
+  echo: true
+---
+
+
+
+```julia; results = "hidden"
+using Pkg
+Pkg.activate("my_environment", shared=true)
+Pkg.add("MLJFlux")
+Pkg.add("MLJ")
+using Dates
+using Statistics
+using DataFrames
+using Queryverse
+using VegaLite
+using MLJ
+using MLJBase
+using MLJFlux
+
+```
+
+### Objective 
+
+The objective is to predict wine quality from wine properties. Wine quality is ranked from 1-10, however for this analysis a three way partition of good moderate and poor will be used to represent wine quality instead. Predictor variables includes , fixed acidity, volatile acidity, citric acid, residual sugar, chlorides, free sulfur dioxide, total sulfur dioxide, density, pH, sulphates and alcohol.
+
+### Data Description
+
+There are 11 potential continuous variables to predict wine quality. Although wine quality scores ranged between 0 and 10 user scores ranged between 3 and 9 with a mean of 5.81. An attempt will be made to partition the wine quality into the classes of good, moderate and poor. 
+The data is also relatively clean with no missing values.
+
+
+```julia
+# Load the wine quality data from .csv file
+wine = Queryverse.load("/home/chigball/Data/wine.csv") |> DataFrame;
+describe(wine)
+```
+
+### Data Exploration
+
+Data was explored by looking at wine scores and wine quality.
+
+##### Distribution of Wine Scores
+
+The distribution of wine scores was explored in order to define a reasonable partition of good, moderate and poor quality scores. It’s determined that poor (0-5), moderate (6) and good (7-10) are logical choices.
+
+```julia
+# Plot of distribution of wine scores
+@vlplot(
+  data = wine,
+  mark = :bar,
+  x = "quality:n",
+  y = {"count()", title = "count"},
+  height = 200,
+  width = 200,
+  title = "Distribution of Wine Scores"
+)
+
+```
+
+
+##### Alcohol Content by Wine Quality
+
+Higher quality wine tend to to have higher alcohol conent on average than lower quality wine.
+
+
+```julia
+# This is a function that maps scores into the class of poor, average or good
+function quality_class(x::Number)
+  if x <= 5
+    value = "poor"
+  elseif x == 6
+    value = "average"
+  elseif x >=7
+    value = "good"
+  end
+  return(value)
+end
+
+
+# Redefine the variable quality into poor, averge or good
+wine1 = wine |> @mutate(quality = quality_class(_.quality)) |> DataFrame;
+
+# Alcohol Content by Wine Quality
+@vlplot(
+  title = "Alcohol Content by Wine Quality",
+  data = wine1,
+  mark = :bar,
+  x = {"quality:n", sort = "y", axis = {labelAngle=0}},
+  y = {"mean(alcohol)", title = "mean % alcohol"},
+  width = 200,
+  height = 200
+)
+
+```
+
+### Data Preperation
+
+The target is "quality" as a categorical array (y), while everything else is the predictor variable.  Data was split into training and testing sets at a 70/30 split
+
+```julia; results = "hidden"
+# Define X and y
+X = wine1 |> @select(-:quality) |> DataFrame;
+y = categorical(wine1.quality);
+
+# Create an index for model and validation sets
+m, v = partition(eachindex(y), 0.7, shuffle=true); 
+
+# Create model/training sets
+Xm = X[m,:];
+ym = y[m];
+
+# Create validation/testing sets
+Xv = X[v,:];
+yv = y[v];
+
+""
+```
+
+### Model Building
+
+A machine learning pipeline was created with a standardizer and a 3 layer neural network .  After some experimentation the number of epochs and batch size was set at 8 and 1 respectively.  
+
+```julia
+# Load nn model
+@load NeuralNetworkClassifier
+
+# Create pipeline
+pipe = @pipeline MyPipe1(
+  std = Standardizer(),
+  nnc = NeuralNetworkClassifier(),
+) prediction_type=:probabilistic
+
+
+# Modifiy the parameters of the pipeline
+pipe.nnc.epochs = 8;
+pipe.nnc.batch_size = 1;
+
+# Fit machine
+mach = machine(pipe, Xm, ym);
+fit!(mach);
+
+pipe
+```
+
+### Model Evaluation
+
+Define resampling strategy
+- holdout(70/30 split)
+
+
+Define measures
+- crossentropy, BrierScore, area under curve
+
+```julia
+# Evaluate model
+evaluate!(mach, 
+  resampling=Holdout(fraction_train=0.7, shuffle=true, rng=1234),
+  measures=[cross_entropy, BrierScore(), area_under_curve],
+  check_measure=false,
+  verbosity = 0
+)
+```
+
+Finally we look at the accuracy based on the testing set, which made up 30% of the data. 
+
+```julia
+# Here we test predictions actual results using the Xv data
+acc = accuracy(predict_mode(mach, Xv), yv);
+acc = round(acc, digits = 3);
+
+println("The final accuracy is $(acc)")
+```

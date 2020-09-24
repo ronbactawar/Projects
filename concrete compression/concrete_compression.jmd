@@ -1,0 +1,213 @@
+---
+title : Concrete Compression Strength 
+author : Ronald Bactawar
+date: `j Date(now())`
+weave_options:
+  echo: true
+---
+
+
+
+```julia
+using Dates
+using Statistics
+using DataFrames
+using Queryverse
+using VegaLite
+using MLJ
+using MLJBase
+using ShapML
+```
+
+### Objective 
+
+The objective is to fit a regression model that predicts concrete strength from a number of factors.
+
+### Data Description
+
+The concrete data was imported from a physical computer hard drive as a .csv file.  The data consist of the target variable concrete-strength along with the predictor variables: cement, blast-furnace, fly-ash, water, superplasticizer, coarse-aggregate, fine-aggregate and age. All variables are continous.
+The data is summarized below and shows that there is no missing data. 
+
+```julia 
+concrete = Queryverse.load("/home/chigball/Data/concrete.csv") |>
+@mutate(age = float(_.age)) |>DataFrame;
+
+# Summarize data 
+describe(concrete)
+
+```
+
+### Data Exploration
+
+As predictors are continuous it might be worthwhile to see which variables tend to be better predictors of concrete strength.  
+Cement seems to be primary predictor of concrete strength.
+
+```julia
+# Create empty cortable dataframe (var1, var2, correlation)
+cortable = DataFrame(var1 = Symbol[], var2 = Symbol[], correlation = Float64[]);
+
+# Populate the columns
+for i in names(concrete), j in names(concrete)
+  push!(cortable, (i, j, cor(concrete[!, i], concrete[!, j])))
+end
+
+# Manipulate table for ploting 
+cordata = cortable |>
+@filter(_.var1 != :concrete_strength) |>
+@filter(_.var2 == :concrete_strength) |>
+@mutate(abs_correlation = abs(_.correlation)) |>
+@mutate(abs_correlation = round(_.abs_correlation, digits = 2)) |>
+@rename(:var1 => :variable) |>
+@select(:variable, :abs_correlation) |>
+DataFrame;
+
+
+# Create Vegalite plot
+@vlplot(
+  data = cordata,
+  mark = :bar,
+  x = {"variable:n", sort = "-y"},
+  y = "abs_correlation:q",
+  title = "Correlation to Concrete Strength",
+  height = 200,
+  width = 300
+  
+)
+
+```
+
+### Model Building
+
+The following steps were used to build a machine learning pipeline:
+
+1. Standardize the predictors
+2. Standardize the target
+3. Fit a KNN regression models
+4. Reverse transform the output (unstandardize)
+
+
+```julia
+
+@load KNNRegressor 
+
+# Create pipeline
+pipe = @pipeline MyPipe2(
+  std = Standardizer(),
+  target = x -> x ./ 100, 
+  knnr = KNNRegressor(),
+  inverse = x -> x .* 100
+)
+
+# Select X and y
+X = concrete |> @select(-:concrete_strength) |> DataFrame;
+y = concrete.concrete_strength;
+
+
+# Fit machine
+mach = machine(pipe, X, y);
+fit!(mach);
+
+# Show pipe
+pipe
+```
+
+### Model Evaluation
+
+Define resampling strategy
+- Holdout(70/30 split)
+
+Define measures
+- Mean Absolute Error (mae), Root Mean Squared Error (rms)
+
+```julia
+evaluate!(mach, 
+  resampling=CV(nfolds=4, rng=1234),
+  measures=[mae, rms],  
+  check_measure=false
+)
+
+```
+
+### Model Tuning
+
+The KNN regression model is not sensitive to hyperparamater tweaking, therefore it will not be modified.
+
+```julia
+# Function to plot learning curves
+function plot_lc(curve::NamedTuple, measure::String)
+  
+  # Create a dataframe from data
+  df = DataFrame(parameter_values = curve.parameter_values, measurements = curve.measurements)
+  
+  # Use vlplot to plot data  
+  @vlplot(
+    data = df,
+    mark = {:line, tooltip = true, point = true},
+    x = {"parameter_values:q", title = curve.parameter_name},
+    y = {"measurements:q", title = measure},
+    title = "Learning Curve",
+    height = 250,
+    width = 260
+  )  
+
+end
+
+# Define ranges for tuning
+r1 = range(pipe, :(knnr.K), lower=1, upper = 10) 
+r2 = range(pipe, :(knnr.leafsize), lower=1, upper = 20) 
+
+# Create 2 learning curves
+curve1 = learning_curve(mach; range=r1, resampling=CV(nfolds=8, rng=1234), measure=rms);
+curve2 = learning_curve(mach; range=r2, resampling=CV(nfolds=8, rng=1234), measure=rms);
+
+# First learning curve
+p1 = plot_lc(curve1, "rms");
+
+# Second learning curve
+p2 = plot_lc(curve2, "rms");
+
+pl = [p1 p2]
+
+```
+
+### Variable Importance
+
+Using stochastic Shapley values predictors can be ranked against the target value.  Consistent with data exploration, it is shown that cement is most predictive of concrete strength.
+
+```julia
+# Get a sample of 300 values
+explain  = X |> @take(1000) |> DataFrame;
+
+# Prediction function to dataframe
+function predict_function(model, data)
+  data_pred = DataFrame(y_pred = predict(model, data))
+  return data_pred
+end
+
+
+# Compute stochastic Shapley values.
+data_shap = ShapML.shap(explain = explain,
+                        model = mach,
+                        predict_function = predict_function,
+                        sample_size = 60,
+                        seed = 1
+                        );
+
+# Calculate Average Absolute Shapley Effect
+shap_df = data_shap |> 
+@select(:index, :feature_name, :shap_effect) |>
+@mutate(abs_shap_effect = abs(_.shap_effect)) |>
+@groupby(_.feature_name) |>
+@map({variable = key(_), average_abs_shap_effect = mean(_.abs_shap_effect)}) |>
+@mutate(average_abs_shap_effect = round(_.average_abs_shap_effect, digits = 2)) |>
+@orderby_descending(_.average_abs_shap_effect) |> DataFrame;
+
+# Plot the results
+@vlplot(
+  data = shap_df,
+  mark = :bar,
+  y = {"variable:n", sort = "-x"},
+  x = "average_abs_shap_effect:q",
+  title = "Shapley Variable Importance"
+)
+```

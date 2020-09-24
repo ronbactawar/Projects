@@ -1,0 +1,394 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[a4paper,text={16.5cm,25.2cm},centering]{geometry}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1.2ex}
+
+\hypersetup
+       {   pdfauthor = { Ronald Bactawar },
+           pdftitle={ Concrete Compression Strength },
+           colorlinks=TRUE,
+           linkcolor=black,
+           citecolor=blue,
+           urlcolor=blue
+       }
+
+\title{ Concrete Compression Strength }
+
+\author{ Ronald Bactawar }
+
+\date{ 2020-08-31 }
+
+\usepackage{upquote}
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    upquote=true,
+    breaklines=true,
+    breakindent=0pt,
+    keepspaces=true,
+    showspaces=false,
+    columns=fullflexible,
+    showtabs=false,
+    showstringspaces=false,
+    escapeinside={(*@}{@*)},
+    extendedchars=true,
+}
+\newcommand{\HLJLt}[1]{#1}
+\newcommand{\HLJLw}[1]{#1}
+\newcommand{\HLJLe}[1]{#1}
+\newcommand{\HLJLeB}[1]{#1}
+\newcommand{\HLJLo}[1]{#1}
+\newcommand{\HLJLk}[1]{\textcolor[RGB]{148,91,176}{\textbf{#1}}}
+\newcommand{\HLJLkc}[1]{\textcolor[RGB]{59,151,46}{\textit{#1}}}
+\newcommand{\HLJLkd}[1]{\textcolor[RGB]{214,102,97}{\textit{#1}}}
+\newcommand{\HLJLkn}[1]{\textcolor[RGB]{148,91,176}{\textbf{#1}}}
+\newcommand{\HLJLkp}[1]{\textcolor[RGB]{148,91,176}{\textbf{#1}}}
+\newcommand{\HLJLkr}[1]{\textcolor[RGB]{148,91,176}{\textbf{#1}}}
+\newcommand{\HLJLkt}[1]{\textcolor[RGB]{148,91,176}{\textbf{#1}}}
+\newcommand{\HLJLn}[1]{#1}
+\newcommand{\HLJLna}[1]{#1}
+\newcommand{\HLJLnb}[1]{#1}
+\newcommand{\HLJLnbp}[1]{#1}
+\newcommand{\HLJLnc}[1]{#1}
+\newcommand{\HLJLncB}[1]{#1}
+\newcommand{\HLJLnd}[1]{\textcolor[RGB]{214,102,97}{#1}}
+\newcommand{\HLJLne}[1]{#1}
+\newcommand{\HLJLneB}[1]{#1}
+\newcommand{\HLJLnf}[1]{\textcolor[RGB]{66,102,213}{#1}}
+\newcommand{\HLJLnfm}[1]{\textcolor[RGB]{66,102,213}{#1}}
+\newcommand{\HLJLnp}[1]{#1}
+\newcommand{\HLJLnl}[1]{#1}
+\newcommand{\HLJLnn}[1]{#1}
+\newcommand{\HLJLno}[1]{#1}
+\newcommand{\HLJLnt}[1]{#1}
+\newcommand{\HLJLnv}[1]{#1}
+\newcommand{\HLJLnvc}[1]{#1}
+\newcommand{\HLJLnvg}[1]{#1}
+\newcommand{\HLJLnvi}[1]{#1}
+\newcommand{\HLJLnvm}[1]{#1}
+\newcommand{\HLJLl}[1]{#1}
+\newcommand{\HLJLld}[1]{\textcolor[RGB]{148,91,176}{\textit{#1}}}
+\newcommand{\HLJLs}[1]{\textcolor[RGB]{201,61,57}{#1}}
+\newcommand{\HLJLsa}[1]{\textcolor[RGB]{201,61,57}{#1}}
+\newcommand{\HLJLsb}[1]{\textcolor[RGB]{201,61,57}{#1}}
+\newcommand{\HLJLsc}[1]{\textcolor[RGB]{201,61,57}{#1}}
+\newcommand{\HLJLsd}[1]{\textcolor[RGB]{201,61,57}{#1}}
+\newcommand{\HLJLsdB}[1]{\textcolor[RGB]{201,61,57}{#1}}
+\newcommand{\HLJLsdC}[1]{\textcolor[RGB]{201,61,57}{#1}}
+\newcommand{\HLJLse}[1]{\textcolor[RGB]{59,151,46}{#1}}
+\newcommand{\HLJLsh}[1]{\textcolor[RGB]{201,61,57}{#1}}
+\newcommand{\HLJLsi}[1]{#1}
+\newcommand{\HLJLso}[1]{\textcolor[RGB]{201,61,57}{#1}}
+\newcommand{\HLJLsr}[1]{\textcolor[RGB]{201,61,57}{#1}}
+\newcommand{\HLJLss}[1]{\textcolor[RGB]{201,61,57}{#1}}
+\newcommand{\HLJLssB}[1]{\textcolor[RGB]{201,61,57}{#1}}
+\newcommand{\HLJLnB}[1]{\textcolor[RGB]{59,151,46}{#1}}
+\newcommand{\HLJLnbB}[1]{\textcolor[RGB]{59,151,46}{#1}}
+\newcommand{\HLJLnfB}[1]{\textcolor[RGB]{59,151,46}{#1}}
+\newcommand{\HLJLnh}[1]{\textcolor[RGB]{59,151,46}{#1}}
+\newcommand{\HLJLni}[1]{\textcolor[RGB]{59,151,46}{#1}}
+\newcommand{\HLJLnil}[1]{\textcolor[RGB]{59,151,46}{#1}}
+\newcommand{\HLJLnoB}[1]{\textcolor[RGB]{59,151,46}{#1}}
+\newcommand{\HLJLoB}[1]{\textcolor[RGB]{102,102,102}{\textbf{#1}}}
+\newcommand{\HLJLow}[1]{\textcolor[RGB]{102,102,102}{\textbf{#1}}}
+\newcommand{\HLJLp}[1]{#1}
+\newcommand{\HLJLc}[1]{\textcolor[RGB]{153,153,119}{\textit{#1}}}
+\newcommand{\HLJLch}[1]{\textcolor[RGB]{153,153,119}{\textit{#1}}}
+\newcommand{\HLJLcm}[1]{\textcolor[RGB]{153,153,119}{\textit{#1}}}
+\newcommand{\HLJLcp}[1]{\textcolor[RGB]{153,153,119}{\textit{#1}}}
+\newcommand{\HLJLcpB}[1]{\textcolor[RGB]{153,153,119}{\textit{#1}}}
+\newcommand{\HLJLcs}[1]{\textcolor[RGB]{153,153,119}{\textit{#1}}}
+\newcommand{\HLJLcsB}[1]{\textcolor[RGB]{153,153,119}{\textit{#1}}}
+\newcommand{\HLJLg}[1]{#1}
+\newcommand{\HLJLgd}[1]{#1}
+\newcommand{\HLJLge}[1]{#1}
+\newcommand{\HLJLgeB}[1]{#1}
+\newcommand{\HLJLgh}[1]{#1}
+\newcommand{\HLJLgi}[1]{#1}
+\newcommand{\HLJLgo}[1]{#1}
+\newcommand{\HLJLgp}[1]{#1}
+\newcommand{\HLJLgs}[1]{#1}
+\newcommand{\HLJLgsB}[1]{#1}
+\newcommand{\HLJLgt}[1]{#1}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{lstlisting}
+(*@\HLJLk{using}@*) (*@\HLJLn{Dates}@*)
+(*@\HLJLk{using}@*) (*@\HLJLn{Statistics}@*)
+(*@\HLJLk{using}@*) (*@\HLJLn{DataFrames}@*)
+(*@\HLJLk{using}@*) (*@\HLJLn{Queryverse}@*)
+(*@\HLJLk{using}@*) (*@\HLJLn{VegaLite}@*)
+(*@\HLJLk{using}@*) (*@\HLJLn{MLJ}@*)
+(*@\HLJLk{using}@*) (*@\HLJLn{MLJBase}@*)
+(*@\HLJLk{using}@*) (*@\HLJLn{ShapML}@*)
+\end{lstlisting}
+
+
+\subsubsection{Objective}
+The objective is to fit a regression model that predicts concrete strength from a number of factors.
+
+\subsubsection{Data Description}
+The concrete data was imported from a physical computer hard drive as a .csv file.  The data consist of the target variable concrete-strength along with the predictor variables: cement, blast-furnace, fly-ash, water, superplasticizer, coarse-aggregate, fine-aggregate and age. All variables are continous. The data is summarized below and shows that there is no missing data. 
+
+
+\begin{lstlisting}
+(*@\HLJLn{concrete}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{Queryverse}@*)(*@\HLJLoB{.}@*)(*@\HLJLnf{load}@*)(*@\HLJLp{(}@*)(*@\HLJLs{"{}/home/chigball/Data/concrete.csv"{}}@*)(*@\HLJLp{)}@*) (*@\HLJLoB{|>}@*)
+(*@\HLJLnd{@mutate}@*)(*@\HLJLp{(}@*)(*@\HLJLn{age}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{float}@*)(*@\HLJLp{(}@*)(*@\HLJLn{{\_}}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{age}@*)(*@\HLJLp{))}@*) (*@\HLJLoB{|>}@*)(*@\HLJLn{DataFrame}@*)(*@\HLJLp{;}@*)
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Summarize}@*) (*@\HLJLcs{data}@*) 
+(*@\HLJLnf{describe}@*)(*@\HLJLp{(}@*)(*@\HLJLn{concrete}@*)(*@\HLJLp{)}@*)
+\end{lstlisting}
+
+
+\begin{tabular}{r|cccccccc}
+	& variable & mean & min & median & max & nunique & nmissing & eltype\\
+	\hline
+	& Symbol & Float64 & Float64 & Float64 & Float64 & Nothing & Nothing & DataType\\
+	\hline
+	1 & cement & 281.168 & 102.0 & 272.9 & 540.0 &  &  & Float64 \\
+	2 & blast\_furnace & 73.8958 & 0.0 & 22.0 & 359.4 &  &  & Float64 \\
+	3 & fly\_ash & 54.1883 & 0.0 & 0.0 & 200.1 &  &  & Float64 \\
+	4 & water & 181.567 & 121.8 & 185.0 & 247.0 &  &  & Float64 \\
+	5 & superplasticizer & 6.20466 & 0.0 & 6.4 & 32.2 &  &  & Float64 \\
+	6 & coarse\_aggregate & 972.919 & 801.0 & 968.0 & 1145.0 &  &  & Float64 \\
+	7 & fine\_aggregate & 773.58 & 594.0 & 779.5 & 992.6 &  &  & Float64 \\
+	8 & age & 45.6621 & 1.0 & 28.0 & 365.0 &  &  & Float64 \\
+	9 & concrete\_strength & 35.818 & 2.33 & 34.445 & 82.6 &  &  & Float64 \\
+\end{tabular}
+
+
+\subsubsection{Data Exploration}
+As predictors are continuous it might be worthwhile to see which variables tend to be better predictors of concrete strength.   Cement seems to be primary predictor of concrete strength.
+
+
+\begin{lstlisting}
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Create}@*) (*@\HLJLcs{empty}@*) (*@\HLJLcs{cortable}@*) (*@\HLJLcs{dataframe}@*) (*@\HLJLcs{(var1,}@*) (*@\HLJLcs{var2,}@*) (*@\HLJLcs{correlation)}@*)
+(*@\HLJLn{cortable}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{DataFrame}@*)(*@\HLJLp{(}@*)(*@\HLJLn{var1}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{Symbol}@*)(*@\HLJLp{[],}@*) (*@\HLJLn{var2}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{Symbol}@*)(*@\HLJLp{[],}@*) (*@\HLJLn{correlation}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{Float64}@*)(*@\HLJLp{[]);}@*)
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Populate}@*) (*@\HLJLcs{the}@*) (*@\HLJLcs{columns}@*)
+(*@\HLJLk{for}@*) (*@\HLJLn{i}@*) (*@\HLJLkp{in}@*) (*@\HLJLnf{names}@*)(*@\HLJLp{(}@*)(*@\HLJLn{concrete}@*)(*@\HLJLp{),}@*) (*@\HLJLn{j}@*) (*@\HLJLkp{in}@*) (*@\HLJLnf{names}@*)(*@\HLJLp{(}@*)(*@\HLJLn{concrete}@*)(*@\HLJLp{)}@*)
+  (*@\HLJLnf{push!}@*)(*@\HLJLp{(}@*)(*@\HLJLn{cortable}@*)(*@\HLJLp{,}@*) (*@\HLJLp{(}@*)(*@\HLJLn{i}@*)(*@\HLJLp{,}@*) (*@\HLJLn{j}@*)(*@\HLJLp{,}@*) (*@\HLJLnf{cor}@*)(*@\HLJLp{(}@*)(*@\HLJLn{concrete}@*)(*@\HLJLp{[}@*)(*@\HLJLoB{!}@*)(*@\HLJLp{,}@*) (*@\HLJLn{i}@*)(*@\HLJLp{],}@*) (*@\HLJLn{concrete}@*)(*@\HLJLp{[}@*)(*@\HLJLoB{!}@*)(*@\HLJLp{,}@*) (*@\HLJLn{j}@*)(*@\HLJLp{])))}@*)
+(*@\HLJLk{end}@*)
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Manipulate}@*) (*@\HLJLcs{table}@*) (*@\HLJLcs{for}@*) (*@\HLJLcs{ploting}@*) 
+(*@\HLJLn{cordata}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{cortable}@*) (*@\HLJLoB{|>}@*)
+(*@\HLJLnd{@filter}@*)(*@\HLJLp{(}@*)(*@\HLJLn{{\_}}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{var1}@*) (*@\HLJLoB{!=}@*) (*@\HLJLsc{:concrete{\_}strength}@*)(*@\HLJLp{)}@*) (*@\HLJLoB{|>}@*)
+(*@\HLJLnd{@filter}@*)(*@\HLJLp{(}@*)(*@\HLJLn{{\_}}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{var2}@*) (*@\HLJLoB{==}@*) (*@\HLJLsc{:concrete{\_}strength}@*)(*@\HLJLp{)}@*) (*@\HLJLoB{|>}@*)
+(*@\HLJLnd{@mutate}@*)(*@\HLJLp{(}@*)(*@\HLJLn{abs{\_}correlation}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{abs}@*)(*@\HLJLp{(}@*)(*@\HLJLn{{\_}}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{correlation}@*)(*@\HLJLp{))}@*) (*@\HLJLoB{|>}@*)
+(*@\HLJLnd{@mutate}@*)(*@\HLJLp{(}@*)(*@\HLJLn{abs{\_}correlation}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{round}@*)(*@\HLJLp{(}@*)(*@\HLJLn{{\_}}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{abs{\_}correlation}@*)(*@\HLJLp{,}@*) (*@\HLJLn{digits}@*) (*@\HLJLoB{=}@*) (*@\HLJLni{2}@*)(*@\HLJLp{))}@*) (*@\HLJLoB{|>}@*)
+(*@\HLJLnd{@rename}@*)(*@\HLJLp{(}@*)(*@\HLJLsc{:var1}@*) (*@\HLJLoB{=>}@*) (*@\HLJLsc{:variable}@*)(*@\HLJLp{)}@*) (*@\HLJLoB{|>}@*)
+(*@\HLJLnd{@select}@*)(*@\HLJLp{(}@*)(*@\HLJLsc{:variable}@*)(*@\HLJLp{,}@*) (*@\HLJLsc{:abs{\_}correlation}@*)(*@\HLJLp{)}@*) (*@\HLJLoB{|>}@*)
+(*@\HLJLn{DataFrame}@*)(*@\HLJLp{;}@*)
+
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Create}@*) (*@\HLJLcs{Vegalite}@*) (*@\HLJLcs{plot}@*)
+(*@\HLJLnd{@vlplot}@*)(*@\HLJLp{(}@*)
+  (*@\HLJLn{data}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{cordata}@*)(*@\HLJLp{,}@*)
+  (*@\HLJLn{mark}@*) (*@\HLJLoB{=}@*) (*@\HLJLsc{:bar}@*)(*@\HLJLp{,}@*)
+  (*@\HLJLn{x}@*) (*@\HLJLoB{=}@*) (*@\HLJLp{{\{}}@*)(*@\HLJLs{"{}variable:n"{}}@*)(*@\HLJLp{,}@*) (*@\HLJLn{sort}@*) (*@\HLJLoB{=}@*) (*@\HLJLs{"{}-y"{}}@*)(*@\HLJLp{{\}},}@*)
+  (*@\HLJLn{y}@*) (*@\HLJLoB{=}@*) (*@\HLJLs{"{}abs{\_}correlation:q"{}}@*)(*@\HLJLp{,}@*)
+  (*@\HLJLn{title}@*) (*@\HLJLoB{=}@*) (*@\HLJLs{"{}Correlation}@*) (*@\HLJLs{to}@*) (*@\HLJLs{Concrete}@*) (*@\HLJLs{Strength"{}}@*)(*@\HLJLp{,}@*)
+  (*@\HLJLn{height}@*) (*@\HLJLoB{=}@*) (*@\HLJLni{200}@*)(*@\HLJLp{,}@*)
+  (*@\HLJLn{width}@*) (*@\HLJLoB{=}@*) (*@\HLJLni{300}@*)
+  
+(*@\HLJLp{)}@*)
+\end{lstlisting}
+
+\includegraphics[width=\linewidth]{jl_IiAuEc/concrete_compression_3_1.pdf}
+
+\subsubsection{Model Building}
+The following steps were used to build a machine learning pipeline:
+
+\begin{itemize}
+\item[1. ] Standardize the predictors
+
+
+\item[2. ] Standardize the target
+
+
+\item[3. ] Fit a KNN regression models
+
+
+\item[4. ] Reverse transform the output (unstandardize)
+
+\end{itemize}
+
+\begin{lstlisting}
+(*@\HLJLnd{@load}@*) (*@\HLJLn{KNNRegressor}@*) 
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Create}@*) (*@\HLJLcs{pipeline}@*)
+(*@\HLJLn{pipe}@*) (*@\HLJLoB{=}@*) (*@\HLJLnd{@pipeline}@*) (*@\HLJLnf{MyPipe2}@*)(*@\HLJLp{(}@*)
+  (*@\HLJLn{std}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{Standardizer}@*)(*@\HLJLp{(),}@*)
+  (*@\HLJLn{target}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{x}@*) (*@\HLJLoB{->}@*) (*@\HLJLn{x}@*) (*@\HLJLoB{./}@*) (*@\HLJLni{100}@*)(*@\HLJLp{,}@*) 
+  (*@\HLJLn{knnr}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{KNNRegressor}@*)(*@\HLJLp{(),}@*)
+  (*@\HLJLn{inverse}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{x}@*) (*@\HLJLoB{->}@*) (*@\HLJLn{x}@*) (*@\HLJLoB{.*}@*) (*@\HLJLni{100}@*)
+(*@\HLJLp{)}@*)
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Select}@*) (*@\HLJLcs{X}@*) (*@\HLJLcs{and}@*) (*@\HLJLcs{y}@*)
+(*@\HLJLn{X}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{concrete}@*) (*@\HLJLoB{|>}@*) (*@\HLJLnd{@select}@*)(*@\HLJLp{(}@*)(*@\HLJLoB{-:}@*)(*@\HLJLn{concrete{\_}strength}@*)(*@\HLJLp{)}@*) (*@\HLJLoB{|>}@*) (*@\HLJLn{DataFrame}@*)(*@\HLJLp{;}@*)
+(*@\HLJLn{y}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{concrete}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{concrete{\_}strength}@*)(*@\HLJLp{;}@*)
+
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Fit}@*) (*@\HLJLcs{machine}@*)
+(*@\HLJLn{mach}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{machine}@*)(*@\HLJLp{(}@*)(*@\HLJLn{pipe}@*)(*@\HLJLp{,}@*) (*@\HLJLn{X}@*)(*@\HLJLp{,}@*) (*@\HLJLn{y}@*)(*@\HLJLp{);}@*)
+(*@\HLJLnf{fit!}@*)(*@\HLJLp{(}@*)(*@\HLJLn{mach}@*)(*@\HLJLp{);}@*)
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Show}@*) (*@\HLJLcs{pipe}@*)
+(*@\HLJLn{pipe}@*)
+\end{lstlisting}
+
+\begin{lstlisting}
+MyPipe2(
+    std = Standardizer(
+            features = Symbol[],
+            ignore = false,
+            ordered(*@{{\_}}@*)factor = false,
+            count = false),
+    target = StaticTransformer(
+            f = Main.(*@{{\#}}@*)(*@{{\#}}@*)WeaveSandBox(*@{{\#}}@*)253.var(*@{"{}}@*)(*@{{\#}}@*)29(*@{{\#}}@*)30(*@{"{}}@*)()),
+    knnr = KNNRegressor(
+            K = 5,
+            algorithm = :kdtree,
+            metric = Distances.Euclidean(0.0),
+            leafsize = 10,
+            reorder = true,
+            weights = :uniform),
+    inverse = StaticTransformer(
+            f = Main.(*@{{\#}}@*)(*@{{\#}}@*)WeaveSandBox(*@{{\#}}@*)253.var(*@{"{}}@*)(*@{{\#}}@*)31(*@{{\#}}@*)32(*@{"{}}@*)())) @ 1(*@\ensuremath{\ldots}@*(89
+\end{lstlisting}
+
+
+\subsubsection{Model Evaluation}
+Define resampling strategy
+
+\begin{itemize}
+\item Holdout(70/30 split)
+
+\end{itemize}
+Define measures
+
+\begin{itemize}
+\item Mean Absolute Error (mae), Root Mean Squared Error (rms)
+
+\end{itemize}
+
+\begin{lstlisting}
+(*@\HLJLnf{evaluate!}@*)(*@\HLJLp{(}@*)(*@\HLJLn{mach}@*)(*@\HLJLp{,}@*) 
+  (*@\HLJLn{resampling}@*)(*@\HLJLoB{=}@*)(*@\HLJLnf{CV}@*)(*@\HLJLp{(}@*)(*@\HLJLn{nfolds}@*)(*@\HLJLoB{=}@*)(*@\HLJLni{4}@*)(*@\HLJLp{,}@*) (*@\HLJLn{rng}@*)(*@\HLJLoB{=}@*)(*@\HLJLni{1234}@*)(*@\HLJLp{),}@*)
+  (*@\HLJLn{measures}@*)(*@\HLJLoB{=}@*)(*@\HLJLp{[}@*)(*@\HLJLn{mae}@*)(*@\HLJLp{,}@*) (*@\HLJLn{rms}@*)(*@\HLJLp{],}@*)  
+  (*@\HLJLn{check{\_}measure}@*)(*@\HLJLoB{=}@*)(*@\HLJLkc{false}@*)
+(*@\HLJLp{)}@*)
+\end{lstlisting}
+
+\begin{lstlisting}
+┌───────────┬───────────────┬──────────────────────────┐
+│ (*@{{\_}}@*).measure │ (*@{{\_}}@*).measurement │ (*@{{\_}}@*).per(*@{{\_}}@*)fold               │
+├───────────┼───────────────┼──────────────────────────┤
+│ mae       │ 6.76          │ [6.94, 6.66, 6.75, 6.7]  │
+│ rms       │ 8.77          │ [8.89, 8.52, 8.82, 8.85] │
+└───────────┴───────────────┴──────────────────────────┘
+(*@{{\_}}@*).per(*@{{\_}}@*)observation = [missing, missing]
+\end{lstlisting}
+
+
+\subsubsection{Model Tuning}
+The KNN regression model is not sensitive to hyperparamater tweaking, therefore it will not be modified.
+
+
+\begin{lstlisting}
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Function}@*) (*@\HLJLcs{to}@*) (*@\HLJLcs{plot}@*) (*@\HLJLcs{learning}@*) (*@\HLJLcs{curves}@*)
+(*@\HLJLk{function}@*) (*@\HLJLnf{plot{\_}lc}@*)(*@\HLJLp{(}@*)(*@\HLJLn{curve}@*)(*@\HLJLoB{::}@*)(*@\HLJLn{NamedTuple}@*)(*@\HLJLp{,}@*) (*@\HLJLn{measure}@*)(*@\HLJLoB{::}@*)(*@\HLJLn{String}@*)(*@\HLJLp{)}@*)
+  
+  (*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Create}@*) (*@\HLJLcs{a}@*) (*@\HLJLcs{dataframe}@*) (*@\HLJLcs{from}@*) (*@\HLJLcs{data}@*)
+  (*@\HLJLn{df}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{DataFrame}@*)(*@\HLJLp{(}@*)(*@\HLJLn{parameter{\_}values}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{curve}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{parameter{\_}values}@*)(*@\HLJLp{,}@*) (*@\HLJLn{measurements}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{curve}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{measurements}@*)(*@\HLJLp{)}@*)
+  
+  (*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Use}@*) (*@\HLJLcs{vlplot}@*) (*@\HLJLcs{to}@*) (*@\HLJLcs{plot}@*) (*@\HLJLcs{data}@*)  
+  (*@\HLJLnd{@vlplot}@*)(*@\HLJLp{(}@*)
+    (*@\HLJLn{data}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{df}@*)(*@\HLJLp{,}@*)
+    (*@\HLJLn{mark}@*) (*@\HLJLoB{=}@*) (*@\HLJLp{{\{}}@*)(*@\HLJLsc{:line}@*)(*@\HLJLp{,}@*) (*@\HLJLn{tooltip}@*) (*@\HLJLoB{=}@*) (*@\HLJLkc{true}@*)(*@\HLJLp{,}@*) (*@\HLJLn{point}@*) (*@\HLJLoB{=}@*) (*@\HLJLkc{true}@*)(*@\HLJLp{{\}},}@*)
+    (*@\HLJLn{x}@*) (*@\HLJLoB{=}@*) (*@\HLJLp{{\{}}@*)(*@\HLJLs{"{}parameter{\_}values:q"{}}@*)(*@\HLJLp{,}@*) (*@\HLJLn{title}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{curve}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{parameter{\_}name}@*)(*@\HLJLp{{\}},}@*)
+    (*@\HLJLn{y}@*) (*@\HLJLoB{=}@*) (*@\HLJLp{{\{}}@*)(*@\HLJLs{"{}measurements:q"{}}@*)(*@\HLJLp{,}@*) (*@\HLJLn{title}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{measure}@*)(*@\HLJLp{{\}},}@*)
+    (*@\HLJLn{title}@*) (*@\HLJLoB{=}@*) (*@\HLJLs{"{}Learning}@*) (*@\HLJLs{Curve"{}}@*)(*@\HLJLp{,}@*)
+    (*@\HLJLn{height}@*) (*@\HLJLoB{=}@*) (*@\HLJLni{250}@*)(*@\HLJLp{,}@*)
+    (*@\HLJLn{width}@*) (*@\HLJLoB{=}@*) (*@\HLJLni{260}@*)
+  (*@\HLJLp{)}@*)  
+
+(*@\HLJLk{end}@*)
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Define}@*) (*@\HLJLcs{ranges}@*) (*@\HLJLcs{for}@*) (*@\HLJLcs{tuning}@*)
+(*@\HLJLn{r1}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{range}@*)(*@\HLJLp{(}@*)(*@\HLJLn{pipe}@*)(*@\HLJLp{,}@*) (*@\HLJLoB{:}@*)(*@\HLJLp{(}@*)(*@\HLJLn{knnr}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{K}@*)(*@\HLJLp{),}@*) (*@\HLJLn{lower}@*)(*@\HLJLoB{=}@*)(*@\HLJLni{1}@*)(*@\HLJLp{,}@*) (*@\HLJLn{upper}@*) (*@\HLJLoB{=}@*) (*@\HLJLni{10}@*)(*@\HLJLp{)}@*) 
+(*@\HLJLn{r2}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{range}@*)(*@\HLJLp{(}@*)(*@\HLJLn{pipe}@*)(*@\HLJLp{,}@*) (*@\HLJLoB{:}@*)(*@\HLJLp{(}@*)(*@\HLJLn{knnr}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{leafsize}@*)(*@\HLJLp{),}@*) (*@\HLJLn{lower}@*)(*@\HLJLoB{=}@*)(*@\HLJLni{1}@*)(*@\HLJLp{,}@*) (*@\HLJLn{upper}@*) (*@\HLJLoB{=}@*) (*@\HLJLni{20}@*)(*@\HLJLp{)}@*) 
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Create}@*) (*@\HLJLcs{2}@*) (*@\HLJLcs{learning}@*) (*@\HLJLcs{curves}@*)
+(*@\HLJLn{curve1}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{learning{\_}curve}@*)(*@\HLJLp{(}@*)(*@\HLJLn{mach}@*)(*@\HLJLp{;}@*) (*@\HLJLn{range}@*)(*@\HLJLoB{=}@*)(*@\HLJLn{r1}@*)(*@\HLJLp{,}@*) (*@\HLJLn{resampling}@*)(*@\HLJLoB{=}@*)(*@\HLJLnf{CV}@*)(*@\HLJLp{(}@*)(*@\HLJLn{nfolds}@*)(*@\HLJLoB{=}@*)(*@\HLJLni{8}@*)(*@\HLJLp{,}@*) (*@\HLJLn{rng}@*)(*@\HLJLoB{=}@*)(*@\HLJLni{1234}@*)(*@\HLJLp{),}@*) (*@\HLJLn{measure}@*)(*@\HLJLoB{=}@*)(*@\HLJLn{rms}@*)(*@\HLJLp{);}@*)
+(*@\HLJLn{curve2}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{learning{\_}curve}@*)(*@\HLJLp{(}@*)(*@\HLJLn{mach}@*)(*@\HLJLp{;}@*) (*@\HLJLn{range}@*)(*@\HLJLoB{=}@*)(*@\HLJLn{r2}@*)(*@\HLJLp{,}@*) (*@\HLJLn{resampling}@*)(*@\HLJLoB{=}@*)(*@\HLJLnf{CV}@*)(*@\HLJLp{(}@*)(*@\HLJLn{nfolds}@*)(*@\HLJLoB{=}@*)(*@\HLJLni{8}@*)(*@\HLJLp{,}@*) (*@\HLJLn{rng}@*)(*@\HLJLoB{=}@*)(*@\HLJLni{1234}@*)(*@\HLJLp{),}@*) (*@\HLJLn{measure}@*)(*@\HLJLoB{=}@*)(*@\HLJLn{rms}@*)(*@\HLJLp{);}@*)
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{First}@*) (*@\HLJLcs{learning}@*) (*@\HLJLcs{curve}@*)
+(*@\HLJLn{p1}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{plot{\_}lc}@*)(*@\HLJLp{(}@*)(*@\HLJLn{curve1}@*)(*@\HLJLp{,}@*) (*@\HLJLs{"{}rms"{}}@*)(*@\HLJLp{);}@*)
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Second}@*) (*@\HLJLcs{learning}@*) (*@\HLJLcs{curve}@*)
+(*@\HLJLn{p2}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{plot{\_}lc}@*)(*@\HLJLp{(}@*)(*@\HLJLn{curve2}@*)(*@\HLJLp{,}@*) (*@\HLJLs{"{}rms"{}}@*)(*@\HLJLp{);}@*)
+
+(*@\HLJLn{pl}@*) (*@\HLJLoB{=}@*) (*@\HLJLp{[}@*)(*@\HLJLn{p1}@*) (*@\HLJLn{p2}@*)(*@\HLJLp{]}@*)
+\end{lstlisting}
+
+\includegraphics[width=\linewidth]{jl_IiAuEc/concrete_compression_6_1.pdf}
+
+\subsubsection{Variable Importance}
+Using stochastic Shapley values predictors can be ranked against the target value.  Consistent with data exploration, it is shown that cement is most predictive of concrete strength.
+
+
+\begin{lstlisting}
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Get}@*) (*@\HLJLcs{a}@*) (*@\HLJLcs{sample}@*) (*@\HLJLcs{of}@*) (*@\HLJLcs{300}@*) (*@\HLJLcs{values}@*)
+(*@\HLJLn{explain}@*)  (*@\HLJLoB{=}@*) (*@\HLJLn{X}@*) (*@\HLJLoB{|>}@*) (*@\HLJLnd{@take}@*)(*@\HLJLp{(}@*)(*@\HLJLni{1000}@*)(*@\HLJLp{)}@*) (*@\HLJLoB{|>}@*) (*@\HLJLn{DataFrame}@*)(*@\HLJLp{;}@*)
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Prediction}@*) (*@\HLJLcs{function}@*) (*@\HLJLcs{to}@*) (*@\HLJLcs{dataframe}@*)
+(*@\HLJLk{function}@*) (*@\HLJLnf{predict{\_}function}@*)(*@\HLJLp{(}@*)(*@\HLJLn{model}@*)(*@\HLJLp{,}@*) (*@\HLJLn{data}@*)(*@\HLJLp{)}@*)
+  (*@\HLJLn{data{\_}pred}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{DataFrame}@*)(*@\HLJLp{(}@*)(*@\HLJLn{y{\_}pred}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{predict}@*)(*@\HLJLp{(}@*)(*@\HLJLn{model}@*)(*@\HLJLp{,}@*) (*@\HLJLn{data}@*)(*@\HLJLp{))}@*)
+  (*@\HLJLk{return}@*) (*@\HLJLn{data{\_}pred}@*)
+(*@\HLJLk{end}@*)
+
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Compute}@*) (*@\HLJLcs{stochastic}@*) (*@\HLJLcs{Shapley}@*) (*@\HLJLcs{values.}@*)
+(*@\HLJLn{data{\_}shap}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{ShapML}@*)(*@\HLJLoB{.}@*)(*@\HLJLnf{shap}@*)(*@\HLJLp{(}@*)(*@\HLJLn{explain}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{explain}@*)(*@\HLJLp{,}@*)
+                        (*@\HLJLn{model}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{mach}@*)(*@\HLJLp{,}@*)
+                        (*@\HLJLn{predict{\_}function}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{predict{\_}function}@*)(*@\HLJLp{,}@*)
+                        (*@\HLJLn{sample{\_}size}@*) (*@\HLJLoB{=}@*) (*@\HLJLni{60}@*)(*@\HLJLp{,}@*)
+                        (*@\HLJLn{seed}@*) (*@\HLJLoB{=}@*) (*@\HLJLni{1}@*)
+                        (*@\HLJLp{);}@*)
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Calculate}@*) (*@\HLJLcs{Average}@*) (*@\HLJLcs{Absolute}@*) (*@\HLJLcs{Shapley}@*) (*@\HLJLcs{Effect}@*)
+(*@\HLJLn{shap{\_}df}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{data{\_}shap}@*) (*@\HLJLoB{|>}@*) 
+(*@\HLJLnd{@select}@*)(*@\HLJLp{(}@*)(*@\HLJLsc{:index}@*)(*@\HLJLp{,}@*) (*@\HLJLsc{:feature{\_}name}@*)(*@\HLJLp{,}@*) (*@\HLJLsc{:shap{\_}effect}@*)(*@\HLJLp{)}@*) (*@\HLJLoB{|>}@*)
+(*@\HLJLnd{@mutate}@*)(*@\HLJLp{(}@*)(*@\HLJLn{abs{\_}shap{\_}effect}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{abs}@*)(*@\HLJLp{(}@*)(*@\HLJLn{{\_}}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{shap{\_}effect}@*)(*@\HLJLp{))}@*) (*@\HLJLoB{|>}@*)
+(*@\HLJLnd{@groupby}@*)(*@\HLJLp{(}@*)(*@\HLJLn{{\_}}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{feature{\_}name}@*)(*@\HLJLp{)}@*) (*@\HLJLoB{|>}@*)
+(*@\HLJLnd{@map}@*)(*@\HLJLp{({\{}}@*)(*@\HLJLn{variable}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{key}@*)(*@\HLJLp{(}@*)(*@\HLJLn{{\_}}@*)(*@\HLJLp{),}@*) (*@\HLJLn{average{\_}abs{\_}shap{\_}effect}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{mean}@*)(*@\HLJLp{(}@*)(*@\HLJLn{{\_}}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{abs{\_}shap{\_}effect}@*)(*@\HLJLp{){\}})}@*) (*@\HLJLoB{|>}@*)
+(*@\HLJLnd{@mutate}@*)(*@\HLJLp{(}@*)(*@\HLJLn{average{\_}abs{\_}shap{\_}effect}@*) (*@\HLJLoB{=}@*) (*@\HLJLnf{round}@*)(*@\HLJLp{(}@*)(*@\HLJLn{{\_}}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{average{\_}abs{\_}shap{\_}effect}@*)(*@\HLJLp{,}@*) (*@\HLJLn{digits}@*) (*@\HLJLoB{=}@*) (*@\HLJLni{2}@*)(*@\HLJLp{))}@*) (*@\HLJLoB{|>}@*)
+(*@\HLJLnd{@orderby{\_}descending}@*)(*@\HLJLp{(}@*)(*@\HLJLn{{\_}}@*)(*@\HLJLoB{.}@*)(*@\HLJLn{average{\_}abs{\_}shap{\_}effect}@*)(*@\HLJLp{)}@*) (*@\HLJLoB{|>}@*) (*@\HLJLn{DataFrame}@*)(*@\HLJLp{;}@*)
+
+(*@\HLJLcs{{\#}}@*) (*@\HLJLcs{Plot}@*) (*@\HLJLcs{the}@*) (*@\HLJLcs{results}@*)
+(*@\HLJLnd{@vlplot}@*)(*@\HLJLp{(}@*)
+  (*@\HLJLn{data}@*) (*@\HLJLoB{=}@*) (*@\HLJLn{shap{\_}df}@*)(*@\HLJLp{,}@*)
+  (*@\HLJLn{mark}@*) (*@\HLJLoB{=}@*) (*@\HLJLsc{:bar}@*)(*@\HLJLp{,}@*)
+  (*@\HLJLn{y}@*) (*@\HLJLoB{=}@*) (*@\HLJLp{{\{}}@*)(*@\HLJLs{"{}variable:n"{}}@*)(*@\HLJLp{,}@*) (*@\HLJLn{sort}@*) (*@\HLJLoB{=}@*) (*@\HLJLs{"{}-x"{}}@*)(*@\HLJLp{{\}},}@*)
+  (*@\HLJLn{x}@*) (*@\HLJLoB{=}@*) (*@\HLJLs{"{}average{\_}abs{\_}shap{\_}effect:q"{}}@*)(*@\HLJLp{,}@*)
+  (*@\HLJLn{title}@*) (*@\HLJLoB{=}@*) (*@\HLJLs{"{}Shapley}@*) (*@\HLJLs{Variable}@*) (*@\HLJLs{Importance"{}}@*)
+(*@\HLJLp{)}@*)
+\end{lstlisting}
+
+\includegraphics[width=\linewidth]{jl_IiAuEc/concrete_compression_7_1.pdf}
+
+
+\end{document}
