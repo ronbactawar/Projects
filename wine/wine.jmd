@@ -11,8 +11,9 @@ weave_options:
 ```julia; results = "hidden"
 using Pkg
 Pkg.activate("my_environment", shared=true)
-Pkg.add("MLJFlux")
 Pkg.add("MLJ")
+Pkg.add("MLJBase")
+Pkg.add("MLJFlux")
 using Dates
 using Statistics
 using DataFrames
@@ -20,8 +21,8 @@ using Queryverse
 using VegaLite
 using MLJ
 using MLJBase
+using Flux
 using MLJFlux
-
 ```
 
 ### Objective 
@@ -126,19 +127,29 @@ yv = y[v];
 A machine learning pipeline was created with a standardizer and a 3 layer neural network .  After some experimentation the number of epochs and batch size was set at 8 and 1 respectively.  
 
 ```julia
-# Load nn model
-@load NeuralNetworkClassifier
+@load NeuralNetworkClassifier;
 
-# Create pipeline
-pipe = @pipeline MyPipe1(
-  std = Standardizer(),
-  nnc = NeuralNetworkClassifier(),
-) prediction_type=:probabilistic
+# Create a builder of ANN with two hiden layers
+mutable struct MyANNBuilder <: MLJFlux.Builder
+  h1::Int64 # number of neurons in first hiden layer
+  h2::Int64 # number of neurons in second hidden layer
+end
 
 
-# Modifiy the parameters of the pipeline
-pipe.nnc.epochs = 8;
-pipe.nnc.batch_size = 1;
+# Define the build Function 
+function MLJFlux.build(B::MyANNBuilder, n_in, n_out)
+  h1 = B.h1
+  h2 = B.h2  
+  mychain = Chain(Dense(n_in, h1, relu), Dense(h1, h2, relu), Dense(h2, n_out, relu))
+  return(mychain)  
+end
+
+# Pipeline with a standardizer and custom NeuralNetworkClassifier
+pipe = @pipeline(
+  Standardizer(),
+  NeuralNetworkClassifier(builder = MyANNBuilder(10,10), epochs = 8, batch_size = 1),
+  prediction_type=:probabilistic
+)
 
 # Fit machine
 mach = machine(pipe, Xm, ym);
