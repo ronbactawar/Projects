@@ -136,7 +136,7 @@ mutable struct MyANNBuilder <: MLJFlux.Builder
 end
 
 
-# Define the build Function 
+# Define the build function 
 function MLJFlux.build(B::MyANNBuilder, n_in, n_out)
   h1 = B.h1
   h2 = B.h2  

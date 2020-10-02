@@ -791,7 +791,7 @@ div.title {text-align: center;}
 </span><span class='hljl-k'>end</span><span class='hljl-t'>
 
 
-</span><span class='hljl-cs'># Define the build Function </span><span class='hljl-t'>
+</span><span class='hljl-cs'># Define the build function </span><span class='hljl-t'>
 </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-n'>MLJFlux</span><span class='hljl-oB'>.</span><span class='hljl-nf'>build</span><span class='hljl-p'>(</span><span class='hljl-n'>B</span><span class='hljl-oB'>::</span><span class='hljl-n'>MyANNBuilder</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>n_in</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>n_out</span><span class='hljl-p'>)</span><span class='hljl-t'>
   </span><span class='hljl-n'>h1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>B</span><span class='hljl-oB'>.</span><span class='hljl-n'>h1</span><span class='hljl-t'>
   </span><span class='hljl-n'>h2</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>B</span><span class='hljl-oB'>.</span><span class='hljl-n'>h2</span><span class='hljl-t'>  
@@ -822,7 +822,7 @@ Pipeline379&#40;
             ordered_factor &#61; false,
             count &#61; false&#41;,
     neural_network_classifier &#61; NeuralNetworkClassifier&#40;
-            builder &#61; MyANNBuilder @207,
+            builder &#61; MyANNBuilder @721,
             finaliser &#61; NNlib.softmax,
             optimiser &#61; Flux.Optimise.ADAM&#40;0.001, &#40;0.9, 0.999&#41;, IdDict&#123;Any,
 Any&#125;&#40;&#41;&#41;,
@@ -831,7 +831,7 @@ Any&#125;&#40;&#41;&#41;,
             batch_size &#61; 1,
             lambda &#61; 0.0,
             alpha &#61; 0.0,
-            optimiser_changes_trigger_retraining &#61; false&#41;&#41; @064
+            optimiser_changes_trigger_retraining &#61; false&#41;&#41; @039
 </pre>
 
 
@@ -860,15 +860,15 @@ Any&#125;&#40;&#41;&#41;,
 
 
 <pre class="output">
-┌──────────────────────────────────────┬───────────────┬─────────────────┐
-│ _.measure                            │ _.measurement │ _.per_fold      │
-├──────────────────────────────────────┼───────────────┼─────────────────┤
-│ cross_entropy                        │ 0.832         │ Float32&#91;0.832&#93;  │
-│ BrierScore&#123;MLJBase.UnivariateFinite&#125; │ -0.515        │ Float32&#91;-0.515&#93; │
-│ area_under_curve                     │ 0.84          │ &#91;0.84&#93;          │
-└──────────────────────────────────────┴───────────────┴─────────────────┘
-_.per_observation &#61; &#91;&#91;&#91;1.04, 0.642, ..., 0.446&#93;&#93;, &#91;&#91;-0.766, -0.395, ..., -0
-.194&#93;&#93;, missing&#93;
+┌──────────────────────────────────────┬───────────────┬────────────────┐
+│ _.measure                            │ _.measurement │ _.per_fold     │
+├──────────────────────────────────────┼───────────────┼────────────────┤
+│ cross_entropy                        │ 0.865         │ Float32&#91;0.865&#93; │
+│ BrierScore&#123;MLJBase.UnivariateFinite&#125; │ -0.53         │ Float32&#91;-0.53&#93; │
+│ area_under_curve                     │ 0.816         │ &#91;0.816&#93;        │
+└──────────────────────────────────────┴───────────────┴────────────────┘
+_.per_observation &#61; &#91;&#91;&#91;0.715, 1.98, ..., 0.304&#93;&#93;, &#91;&#91;-0.456, -1.21, ..., -0.
+132&#93;&#93;, missing&#93;
 _.fitted_params_per_fold &#61; &#91; … &#93;
 _.report_per_fold &#61; &#91; … &#93;
 </pre>
@@ -887,7 +887,7 @@ _.report_per_fold &#61; &#91; … &#93;
 
 
 <pre class="output">
-The final accuracy is 0.594
+The final accuracy is 0.585
 </pre>
 
 
