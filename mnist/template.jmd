@@ -1,0 +1,51 @@
+---
+title : Project Name 
+author : Ronald Bactawar
+date: `j Date(now())`
+weave_options:
+  echo: true
+---
+
+
+
+```julia
+using Dates
+using Statistics
+using DataFrames
+using Queryverse
+using VegaLite
+using MLJ
+using ShapML
+```
+
+### Objective and Preview
+
+
+```julia
+
+```
+
+### Data Summary
+
+```julia
+
+```
+
+### Data Exploration
+
+```julia
+
+```
+
+
+### Model Building
+
+```julia
+
+```
+
+### Model Tuning
+
+```julia
+
+```

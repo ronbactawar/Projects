@@ -1,0 +1,131 @@
+---
+title : MNIST 
+author : Ronald Bactawar
+date: `j Date(now())`
+weave_options:
+  echo: true
+---
+
+
+
+```julia; results = "hidden"
+using Pkg
+Pkg.activate("my_environment", shared=true)
+Pkg.add("MLJFlux")
+Pkg.add("MLJ")
+using Dates
+using Statistics
+using DataFrames
+using Queryverse
+using VegaLite
+using MLJ
+using MLJBase
+using MLJFlux
+using Flux
+```
+
+### Objective
+
+The objective is to develop and use a deep-learning neural to classify the hand written number images of the mnist dataset.
+
+### Data
+
+A dataframe of a thousand 28 X 28 images and labels were generated for this analysis. Modeling and testing data was partitioned on the basis of a 70/30 split. An example of such an image is given below.
+
+
+```julia
+# Load 1000 images and labels into a dataframe
+minst = 
+DataFrame(images = Flux.Data.MNIST.images(), labels = Flux.Data.MNIST.labels()) |> 
+@take(1000) |> @mutate(labels = string(_.labels)) |> DataFrame
+
+# Get X and y
+X = minst.images
+y = categorical(minst.labels)
+
+# Create an index for model and validation sets
+m, v = partition(eachindex(y), 0.7, shuffle=true)
+
+# Data for modeling
+Xm = X[m]
+ym = y[m]
+
+# Data for validation 
+Xv = X[v]
+yv = y[v]
+
+# Example image
+X[5]
+
+```
+
+### Model Building
+
+A Deep Neural network defined by convolution, maxpool and dense layers was generated. The architecture of this network was as follows: conv, maxpool, conv, maxpool, dense. The number of channels in the first and second conv layer was 9 and 27 respectively.
+
+```julia
+# Define a builder of 2 channels for our custom deep neural network
+mutable struct MyANN <: MLJFlux.Builder
+  channels1::Int64
+  channels2::Int64
+end
+
+# n_channels is number of channels of input image and it is usually 3 or 1 because of rgb or greyscale inputs
+# n_in is a tuple such as (28, 28) with represents the length and width of image
+# n_out is number of levels of the y output, n_out = 10 (digits 0-9) in the case of mnist
+# for conv layers choose pad = (f - 1) / 2 to preserve HW dimensions
+# for maxpool choose (2,2) with f = stride = 2 to shrink image by a 2 each time
+# After pooling the image shrinks as follows: (28, 28) -> (14, 14) ->  (7, 7)
+
+function MLJFlux.build(b::MyANN, n_in, n_out, n_channels)
+  c1, c2 = b.channels1, b.channels2  
+  
+  Chain(
+    Conv((3,3), n_channels => c1, relu; pad=1),
+    MaxPool((2,2); pad = 0, stride = 2),
+    Conv((3,3), c1 => c2, relu; pad=1),
+    MaxPool((2,2); pad = 0, stride = 2),
+    Flux.flatten,
+    Dense(49 * c2, n_out) 
+  )  
+
+end
+
+#Load ImageClassifier
+@load ImageClassifier
+
+# Create an image classifier model with 9 and 27 channels
+clf = ImageClassifier(builder=MyANN(9, 27),
+                      epochs=10,
+                      loss=Flux.crossentropy)
+
+# Create and fit machine
+mach = machine(clf, Xm, ym)
+fit!(mach)
+
+# Show model
+clf
+```
+
+
+### Model Evaluation
+
+Model accuracy was tested in two ways:
+
+1. Via 6-fold cross validation
+2. Using the testing set
+
+In both cases the models was over 90% accurate.
+
+```julia
+# Model evaluation using a holdout
+evaluate!(mach, resampling=CV(nfolds=6, rng=1234), operation=predict_mode, measure=accuracy)
+```
+
+```julia
+# Here we test predictions actual results using the Xv data
+acc = accuracy(predict_mode(mach, Xv), yv)
+acc = round(acc, digits = 3);
+
+println("The final accuracy is $(acc)")
+```
