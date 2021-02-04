@@ -9,6 +9,7 @@ begin
 	using Pkg
 	Pkg.activate("my_environment", shared=true)
 	using Statistics
+	using StatsBase: corkendall
 	using DataFrames
 	using Queryverse
 	using VegaLite
@@ -275,8 +276,45 @@ The chart below ranks variables in types of contribuion to the model, under the 
 
 "
 
-# ╔═╡ c262cee4-60bd-11eb-2f2c-9daf08dfbd59
+# ╔═╡ 24a44486-66fd-11eb-1a18-b574ffc9415b
 begin
+	# Takes a data_shap dataframe and returns a better formated one
+	function better_shap(ds::DataFrame)
+	  DataFrame(
+	  feature_name = ds.feature_name,
+	  feature_value = float.(identity.(ds.feature_value)),
+	  shap_effect = Float64.(ds.shap_effect)
+	)  
+	end
+	
+	# Function for creating a data-field with positive/negative
+	function polarity(r::Real)
+	  if r >= 0
+	    return("positive")
+	  else
+	    return("negative")
+	  end
+	end
+	
+	# Function to plot shapley data
+	function shap_plot(data_shap::DataFrame)
+	  #Shows important variables
+	  better_shap(data_shap) |> 
+	  @mutate(abs_shap_effect = abs(_.shap_effect)) |>
+	  @groupby(_.feature_name) |>
+	  @map({variable = key(_), average_abs_shap_effect = mean(_.abs_shap_effect), 		  correlation = corkendall(_.shap_effect, _.feature_value)}) |> 
+	  @mutate(impact = polarity(_.correlation)) |> 
+	  @vlplot(
+	  mark = :bar,
+	  y = {"variable:n", sort = "-x", title = "feature"},
+	  x = {"average_abs_shap_effect:q", title = "mean |shap effect|"},
+	  color = "impact:n",
+	  title = "Shapley Variable Importance"
+	)  
+	end
+	
+	
+	
 	# Get a sample of values
 	explain  = Xm |> @take(5000) |> DataFrame;
 	
@@ -289,29 +327,35 @@ begin
 	
 	# Compute stochastic Shapley values.
 	data_shap = ShapML.shap(explain = explain,
-	                        model = mach2,
+	                        model = mach,
 	                        predict_function = predict_function,
 	                        sample_size = 60,
 	                        seed = 1
 	                        );
 	
-	# Calculate Average Absolute Shapley Effect
-	shap_df = data_shap |> 
-	@select(:index, :feature_name, :shap_effect) |>
-	@mutate(abs_shap_effect = abs(_.shap_effect)) |>
-	@groupby(_.feature_name) |>
-	@map({variable = key(_), average_abs_shap_effect = mean(_.abs_shap_effect)}) |>
-	@mutate(average_abs_shap_effect = round(_.average_abs_shap_effect, digits = 2)) |>
-	@orderby_descending(_.average_abs_shap_effect) |> DataFrame;
-	
-	# Plot the results
+	# Plot variable importance
+	shap_plot(data_shap)
+end
+
+# ╔═╡ 1cdb81b8-670b-11eb-0bc6-597120b7daa5
+md"
+This chart shows how important variables correlate with house price. For example having Indian Marble has a negative correlation on house price and is consistent with the shapely variable importance plot. For other variables having a feature or having more of it correlates with higher house price.
+
+"
+
+# ╔═╡ 2727f97a-66fd-11eb-0fa6-e3766e961e7a
+let
+	# How important variables correlate with house price
+	better_shap(data_shap) |>
+	@filter(_.feature_name != "Area") |>
 	@vlplot(
-	  data = shap_df,
-	  mark = :bar,
-	  y = {"variable:n", sort = "-x"},
-	  x = "average_abs_shap_effect:q",
-	  title = "Shapley Variable Importance"
-	)
+  	mark = :point,
+  	x = {"feature_value:q", title = "feature value"},
+ 	 y = {"shap_effect:q", title = "shap effect"},
+  	wrap = {"feature_name:n", title = "Feature Name"},
+  	columns = 3  
+	) 
+	
 end
 
 # ╔═╡ Cell order:
@@ -320,26 +364,27 @@ end
 # ╟─9b776da2-5f2e-11eb-03b5-5f6d33e1f080
 # ╟─37658576-5f2f-11eb-26ff-0922333ddcad
 # ╟─7ece7140-5f2f-11eb-199d-1d1f9c6f2c8a
-# ╟─01f3be5c-5f49-11eb-287c-fb2fa0de4fd4
+# ╠═01f3be5c-5f49-11eb-287c-fb2fa0de4fd4
 # ╟─66fa624e-5f47-11eb-0e88-53484161f6a6
-# ╟─a53dd96e-5f47-11eb-3ea0-0788d12dff13
+# ╠═a53dd96e-5f47-11eb-3ea0-0788d12dff13
 # ╟─ef09109a-5f47-11eb-284f-014889170ef4
-# ╟─6e9ca784-5f48-11eb-2dc5-433b85aac6a8
+# ╠═6e9ca784-5f48-11eb-2dc5-433b85aac6a8
 # ╟─fa39b260-5f4c-11eb-0575-a7f84b9aa954
-# ╟─16d43366-5f4d-11eb-37a7-adea621cdfc6
+# ╠═16d43366-5f4d-11eb-37a7-adea621cdfc6
 # ╟─16b7e166-5f4d-11eb-2fb7-b7e056adf40c
-# ╟─169ad614-5f4d-11eb-3665-6b4679f0caf7
-# ╟─16833e2a-5f4d-11eb-1ffd-e7035e1c5edd
+# ╠═169ad614-5f4d-11eb-3665-6b4679f0caf7
+# ╠═16833e2a-5f4d-11eb-1ffd-e7035e1c5edd
 # ╟─16691c8c-5f4d-11eb-0594-f1913d78ee84
 # ╟─f4015f20-5f61-11eb-16c4-859573f8d2ab
 # ╟─ec9ac81e-5f63-11eb-2f14-a3b015a21b4a
-# ╟─f3e2ea54-5f61-11eb-037f-a9cfe47f6ffa
+# ╠═f3e2ea54-5f61-11eb-037f-a9cfe47f6ffa
 # ╟─f3be513c-5f61-11eb-1a77-abaa3bcf7fec
 # ╟─b128d932-5f64-11eb-3e00-0f81dac4d709
 # ╟─d36f8504-5f64-11eb-108c-d75388d40759
-# ╟─b432fd02-5f74-11eb-05fd-3784cecbe6d8
+# ╠═b432fd02-5f74-11eb-05fd-3784cecbe6d8
 # ╟─c291965a-60bd-11eb-32cd-095930757708
 # ╟─c27c1834-60bd-11eb-065c-cfd56a1ade95
 # ╟─e0ee04d2-60cd-11eb-06ed-d9308b22ce0d
-# ╟─c262cee4-60bd-11eb-2f2c-9daf08dfbd59
-
+# ╠═24a44486-66fd-11eb-1a18-b574ffc9415b
+# ╟─1cdb81b8-670b-11eb-0bc6-597120b7daa5
+# ╠═2727f97a-66fd-11eb-0fa6-e3766e961e7a
