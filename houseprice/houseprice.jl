@@ -23,9 +23,6 @@ body.hide-all-code pluto-input {display: none !important;}
 
 <button onClick="document.body.classList.toggle('hide-all-code')">Show/hide all code</button> 
 
-<script>
-document.body.classList.add('hide-all-code')
-</script>
 
 """
 
