@@ -20,12 +20,15 @@ end
 # ╔═╡ 785014f4-e0c6-4523-b548-90f0aae9ad27
 showhidebutton = html"""
 <style>
-body.hide-all-code pluto-input {
-	display: none !important;
-}
+body.hide-all-code pluto-input {display: none !important;}
 </style>
 
 <button onClick="document.body.classList.toggle('hide-all-code')">Show/hide all code</button> 
+
+<script>
+document.body.classList.add('hide-all-code')
+</script>
+
 """
 
 # ╔═╡ 72e92e89-c5f3-40fc-9403-fd7938e0ffd7
@@ -356,7 +359,7 @@ md"
 # ╠═785014f4-e0c6-4523-b548-90f0aae9ad27
 # ╠═72e92e89-c5f3-40fc-9403-fd7938e0ffd7
 # ╠═ddfd4874-cad7-11eb-304a-35d3cbefc98e
-# ╟─25ebaa52-1aab-4fb9-b41c-d20f51e48554
+# ╠═25ebaa52-1aab-4fb9-b41c-d20f51e48554
 # ╟─ce12b1da-54bc-4d1e-ae15-29267dae4e08
 # ╟─12897db9-989b-43d2-8913-60b15e46ef39
 # ╠═174ba3e4-bb41-45dd-b30d-262a070fd49e

@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.20
+# v0.14.8
 
 using Markdown
 using InteractiveUtils
@@ -7,15 +7,41 @@ using InteractiveUtils
 # ╔═╡ 02221a8e-5f2d-11eb-0736-17dd58b3bf81
 begin
 	using Pkg
-	Pkg.activate("my_environment", shared=true)
-	using Statistics
+	Pkg.activate("MLJ_environment", shared=true)
 	using StatsBase: corkendall
 	using DataFrames
 	using Queryverse
 	using VegaLite
 	using MLJ
-	using ShapML
 end
+
+# ╔═╡ 71be8616-2f30-48dd-94cc-4544896e6e79
+showhidebutton = html"""
+<style>
+body.hide-all-code pluto-input {display: none !important;}
+</style>
+
+<button onClick="document.body.classList.toggle('hide-all-code')">Show/hide all code</button> 
+
+<script>
+document.body.classList.add('hide-all-code')
+</script>
+
+"""
+
+# ╔═╡ 28470ba4-9a14-4aa6-a042-1a49d5c3b0bb
+html"""<style>
+main {
+    max-width: 1000px;
+    align-self: center;
+  
+}
+"""
+
+# ╔═╡ f671d676-af5c-4192-a2c3-7fcd3393e1fe
+md"
+# Home Price Prediction
+" 
 
 # ╔═╡ 0674f088-5f2e-11eb-15fd-1105e972504e
 md"## Objective
@@ -60,7 +86,7 @@ begin
 	
 	# Manipulate data for data exploration
 	houseprice_ex = houseprice |> 
-	@mutate(MarbleType = string(_.WhiteMarble) * string(_.BlackMarble) * 				string(_.IndianMarble)) |> 
+	@mutate(MarbleType = string(_.WhiteMarble) * string(_.BlackMarble) * string(_.IndianMarble)) |> 
 	@mutate(MarbleType = D1[_.MarbleType]) |>
 	@mutate(Floors = D2[_.Floors]) |> # Floors
 	@mutate(Solar = D2[_.Solar]) |> # Solar
@@ -71,19 +97,19 @@ begin
 	@mutate(Garden = D2[_.Garden]) |> # Garden
 	@select(1:4, 17, 8:16) |> DataFrame
 	
-	# Code creates expressions for aggregation and plotting of dependent variable 	 against average price 
+	# Code creates expressions for aggregation and plotting of dependent variable against average price 
 	function aggprice(v::Symbol, x::String)
-	:(
-	houseprice_ex |> 
-	@groupby(_.$v) |> 
-	@map({$v = key(_), Avg_Price = mean(_.Prices)}) |> 
-	@orderby(_.$v) |> 
-	@vlplot(
-	mark = :bar,
-	x = $x,
-	y = {"Avg_Price:q", title = "Average Price"}
-	)  
-	)
+		:(
+		houseprice_ex |> 
+		@groupby(_.$v) |> 
+		@map({$v = key(_), Avg_Price = mean(_.Prices)}) |> 
+		@orderby(_.$v) |> 
+		@vlplot(
+		mark = :bar,
+		x = $x,
+		y = {"Avg_Price:q", title = "Average Price"}
+		)  
+		)
 	end
 	
 	# Data plots of dependent variables vs price
@@ -156,7 +182,8 @@ The data was split into a training and testing set (70/30). The data science pip
 # ╔═╡ 169ad614-5f4d-11eb-3665-6b4679f0caf7
 begin
 	# Filter data for useful variables and convert Prices to float
-	houseprice_mod = houseprice |>@select(-:Solar, -:SwimingPool, -:Garden) |>             @mutate(Prices = float(_.Prices)) |> DataFrame;
+	houseprice_mod = houseprice |>@select(-:Solar, -:SwimingPool, -:Garden) |> 
+	@mutate(Prices = float(_.Prices)) |> DataFrame;
 	
 	# Select X and y for modeling
 	X = houseprice_mod |> @select(-:Prices) |> DataFrame
@@ -174,22 +201,28 @@ begin
 	yv = y[v]
 	
 	# load EvoTreeRegressor model
-	@load EvoTreeRegressor pkg="EvoTrees"
+	Tree = @load EvoTreeRegressor pkg="EvoTrees"
 	
-	# Create pipeline that converts inputs into continous and fits an EvoTreeRegressor
-	pipe = MLJ.@pipeline(
+
+end;
+
+# ╔═╡ a930518a-f33b-4af1-923c-cfc652422359
+begin
+    # Create pipeline that converts inputs into continous and fits an EvoTreeRegressor
+	pipe = @pipeline(
 	X -> coerce(X, Count => Continuous),
-	EvoTreeRegressor(max_depth = 8),
+	Tree(max_depth = 8),
 	prediction_type=:deterministic
 	);
 	
 	# Fit machine
 	mach = machine(pipe, Xm, ym);
-	fit!(mach);
+	fit!(mach)
 	
-end;
+md""
+end
 
-# ╔═╡ 16833e2a-5f4d-11eb-1ffd-e7035e1c5edd
+# ╔═╡ e0ac4d71-d502-4876-b085-154d695bd5ca
 pipe
 
 # ╔═╡ 16691c8c-5f4d-11eb-0594-f1913d78ee84
@@ -261,105 +294,51 @@ begin
 	# Model Evaluation on test data
 	yp = collect(predict(mach2, Xv))
 	RMS = round(rms(yp, yv), digits = 0) 
-	COR = round(Statistics.cor(yp, yv), digits = 3) 
+	COR = round(corkendall(yp, yv), digits = 3) 
 end;
 
 # ╔═╡ c27c1834-60bd-11eb-065c-cfd56a1ade95
 md"
-A rms error of $(RMS)  was also achieved for the test set.
+A rms error of $(RMS) and a corelation of $(COR)  was also achieved for the test set.
 "
-
-# ╔═╡ e0ee04d2-60cd-11eb-06ed-d9308b22ce0d
-md"
-## Variable Importance
-The chart below ranks variables in types of contribuion to the model, under the Shapley framework. Interestingly, Floors, Fiber and WhiteMarble are the best predictors of house price.
-
-"
-
-# ╔═╡ 24a44486-66fd-11eb-1a18-b574ffc9415b
-begin
-	# Takes a data_shap dataframe and returns a better formated one
-	function better_shap(ds::DataFrame)
-	  DataFrame(
-	  feature_name = ds.feature_name,
-	  feature_value = float.(identity.(ds.feature_value)),
-	  shap_effect = Float64.(ds.shap_effect)
-	)  
-	end
-	
-	# Function for creating a data-field with positive/negative
-	function polarity(r::Real)
-	  if r >= 0
-	    return("positive")
-	  else
-	    return("negative")
-	  end
-	end
-	
-	# Function to plot shapley data
-	function shap_plot(data_shap::DataFrame)
-	  #Shows important variables
-	  better_shap(data_shap) |> 
-	  @mutate(abs_shap_effect = abs(_.shap_effect)) |>
-	  @groupby(_.feature_name) |>
-	  @map({variable = key(_), average_abs_shap_effect = mean(_.abs_shap_effect), 		  correlation = corkendall(_.shap_effect, _.feature_value)}) |> 
-	  @mutate(impact = polarity(_.correlation)) |> 
-	  @vlplot(
-	  mark = :bar,
-	  y = {"variable:n", sort = "-x", title = "feature"},
-	  x = {"average_abs_shap_effect:q", title = "mean |shap effect|"},
-	  color = "impact:n",
-	  title = "Shapley Variable Importance"
-	)  
-	end
-	
-	
-	
-	# Get a sample of values
-	explain  = Xm |> @take(5000) |> DataFrame;
-	
-	# Prediction function to dataframe
-	function predict_function(model, data)
-	  data_pred = DataFrame(y_pred = predict(model, data))
-	  return data_pred
-	end
-	
-	
-	# Compute stochastic Shapley values.
-	data_shap = ShapML.shap(explain = explain,
-	                        model = mach,
-	                        predict_function = predict_function,
-	                        sample_size = 60,
-	                        seed = 1
-	                        );
-	
-	# Plot variable importance
-	shap_plot(data_shap)
-end
 
 # ╔═╡ 1cdb81b8-670b-11eb-0bc6-597120b7daa5
 md"
-This chart shows how important variables correlate with house price. For example having Indian Marble has a negative correlation on house price and is consistent with the shapely variable importance plot. For other variables having a feature or having more of it correlates with higher house price.
-
+## Feature Importance
+Feature selection was done using EvoTree's normalized gain by feature. The most important variables are shown below. Having more floors along with the presence of fiber optics and white marble relates to higher prices. 
 "
 
-# ╔═╡ 2727f97a-66fd-11eb-0fa6-e3766e961e7a
-let
-	# How important variables correlate with house price
-	better_shap(data_shap) |>
-	@filter(_.feature_name != "Area") |>
-	@vlplot(
-  	mark = :point,
-  	x = {"feature_value:q", title = "feature value"},
- 	 y = {"shap_effect:q", title = "shap effect"},
-  	wrap = {"feature_name:n", title = "Feature Name"},
-  	columns = 3  
-	) 
-	
+# ╔═╡ 411a026a-6bf7-45f8-929f-8e3b9fef77ac
+begin
+	# A function to extract the feature importance from a mach object of an evotree classifier
+	function Importance(mach::Machine)
+		df = report(mach).evo_tree_regressor |> DataFrame |>
+		@mutate(Feature = first.(_.feature_importances)) |>
+		@mutate(Importance = last.(_.feature_importances)) |>
+		@mutate(Importance = round.(_.Importance, digits = 2)) |>
+		@filter(_.Importance > 0) |> 
+		@select(:Feature, :Importance) |> 
+		@vlplot(
+			x = "Importance:q",
+			y = {"Feature:n", sort = "-x"},
+			mark = {:bar, tooltops = true},
+			height = 300,
+			title = "Feature Importance Ranking"    
+		)
+	end;
+md""
 end
 
+
+# ╔═╡ a3d3a23f-0d34-42b8-9df9-b63d6060b986
+# Plot the feature importance ranking
+Importance(mach2)
+
 # ╔═╡ Cell order:
+# ╠═71be8616-2f30-48dd-94cc-4544896e6e79
+# ╠═28470ba4-9a14-4aa6-a042-1a49d5c3b0bb
 # ╟─02221a8e-5f2d-11eb-0736-17dd58b3bf81
+# ╟─f671d676-af5c-4192-a2c3-7fcd3393e1fe
 # ╟─0674f088-5f2e-11eb-15fd-1105e972504e
 # ╟─9b776da2-5f2e-11eb-03b5-5f6d33e1f080
 # ╟─37658576-5f2f-11eb-26ff-0922333ddcad
@@ -373,18 +352,18 @@ end
 # ╠═16d43366-5f4d-11eb-37a7-adea621cdfc6
 # ╟─16b7e166-5f4d-11eb-2fb7-b7e056adf40c
 # ╠═169ad614-5f4d-11eb-3665-6b4679f0caf7
-# ╠═16833e2a-5f4d-11eb-1ffd-e7035e1c5edd
-# ╟─16691c8c-5f4d-11eb-0594-f1913d78ee84
+# ╠═a930518a-f33b-4af1-923c-cfc652422359
+# ╠═e0ac4d71-d502-4876-b085-154d695bd5ca
+# ╠═16691c8c-5f4d-11eb-0594-f1913d78ee84
 # ╟─f4015f20-5f61-11eb-16c4-859573f8d2ab
 # ╟─ec9ac81e-5f63-11eb-2f14-a3b015a21b4a
 # ╠═f3e2ea54-5f61-11eb-037f-a9cfe47f6ffa
-# ╟─f3be513c-5f61-11eb-1a77-abaa3bcf7fec
+# ╠═f3be513c-5f61-11eb-1a77-abaa3bcf7fec
 # ╟─b128d932-5f64-11eb-3e00-0f81dac4d709
-# ╟─d36f8504-5f64-11eb-108c-d75388d40759
+# ╠═d36f8504-5f64-11eb-108c-d75388d40759
 # ╠═b432fd02-5f74-11eb-05fd-3784cecbe6d8
-# ╟─c291965a-60bd-11eb-32cd-095930757708
-# ╟─c27c1834-60bd-11eb-065c-cfd56a1ade95
-# ╟─e0ee04d2-60cd-11eb-06ed-d9308b22ce0d
-# ╠═24a44486-66fd-11eb-1a18-b574ffc9415b
+# ╠═c291965a-60bd-11eb-32cd-095930757708
+# ╠═c27c1834-60bd-11eb-065c-cfd56a1ade95
 # ╟─1cdb81b8-670b-11eb-0bc6-597120b7daa5
-# ╠═2727f97a-66fd-11eb-0fa6-e3766e961e7a
+# ╠═411a026a-6bf7-45f8-929f-8e3b9fef77ac
+# ╠═a3d3a23f-0d34-42b8-9df9-b63d6060b986
